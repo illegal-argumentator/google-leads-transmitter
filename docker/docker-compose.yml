@@ -1,7 +1,7 @@
 version: '3.8'
 
 networks:
-  vlad-iglin-app:
+  vlad-iglin-application:
     driver: bridge
     ipam:
       config:
