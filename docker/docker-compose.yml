@@ -1,0 +1,27 @@
+version: '3.8'
+
+networks:
+  vlad-iglin-app:
+
+services:
+  application:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    networks:
+      - vlad-iglin-app
+
+  mongodb:
+    image: 'mongo:latest'
+    networks:
+      - vlad-iglin-app
+    ports:
+      - '27017:27017'
+    volumes:
+      - vlad-iglin-data:/data/db
+
+volumes:
+  vlad-iglin-data:
