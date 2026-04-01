@@ -4,7 +4,7 @@ networks:
   vlad-iglin-app:
 
 services:
-  application:
+  google-leads-app:
     build:
       context: ..
       dockerfile: Dockerfile
@@ -13,13 +13,17 @@ services:
       - "${APP_PORT}:${APP_PORT}"
     networks:
       - vlad-iglin-app
+    depends_on:
+      - google-leads-mongodb
 
-  mongodb:
+  google-leads-mongodb:
+    env_file:
+      - .env
     image: 'mongo:latest'
     networks:
       - vlad-iglin-app
     ports:
-      - '27017:27017'
+      - '${DB_PORT}:27017'
     volumes:
       - vlad-iglin-data:/data/db
 
