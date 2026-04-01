@@ -1,7 +1,7 @@
 version: '3.8'
 
 networks:
-  vlad-iglin-application:
+  vlad-iglin-network:
     driver: bridge
     ipam:
       config:
@@ -16,7 +16,7 @@ services:
     ports:
       - "${APP_PORT}:${APP_PORT}"
     networks:
-      - vlad-iglin-app
+      - vlad-iglin-network
     depends_on:
       - google-leads-mongodb
 
@@ -25,7 +25,7 @@ services:
       - .env
     image: 'mongo:latest'
     networks:
-      - vlad-iglin-app
+      - vlad-iglin-network
     ports:
       - '${DB_PORT}:27017'
     volumes:
