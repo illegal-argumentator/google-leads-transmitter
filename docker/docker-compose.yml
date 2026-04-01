@@ -2,6 +2,10 @@ version: '3.8'
 
 networks:
   vlad-iglin-app:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
 
 services:
   google-leads-app:
