@@ -16,7 +16,7 @@ services:
     ports:
       - "${APP_PORT}:${APP_PORT}"
     networks:
-      - vlad-iglin-network
+      - vlad_iglin_network
     depends_on:
       - google-leads-mongodb
 
@@ -25,7 +25,7 @@ services:
       - .env
     image: 'mongo:latest'
     networks:
-      - vlad-iglin-network
+      - vlad_iglin_network
     ports:
       - '${DB_PORT}:27017'
     volumes:
