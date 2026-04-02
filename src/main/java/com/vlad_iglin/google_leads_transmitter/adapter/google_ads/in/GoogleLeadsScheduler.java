@@ -14,7 +14,7 @@ class GoogleLeadsScheduler {
     private final GoogleLeadsTransmissionService transmissionService;
 
     @Scheduled(fixedDelay = 5000 * 60 * 60, initialDelay = 1000 * 60 * 60)
-    private void processLeadsTransmission() {
+    public void processLeadsTransmission() {
         log.info("Processing leads transmission.");
         transmissionService.processTransmission();
     }
