@@ -5,10 +5,12 @@ import com.vlad_iglin.google_leads_transmitter.port.GoogleLeadsPort;
 import com.vlad_iglin.google_leads_transmitter.port.LeadCommandPort;
 import com.vlad_iglin.google_leads_transmitter.port.MovingLeadCommandPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GoogleLeadsTransmissionService {
@@ -18,7 +20,9 @@ public class GoogleLeadsTransmissionService {
     private final MovingLeadCommandPort movingLeadCommandPort;
 
     public void processTransmission() {
+        log.info("Retrieving latest leads from Google Ads.");
         List<Lead> leads = googleLeadsPort.getLatestLeads();
+        log.info("Saving leads.");
         leads.forEach(this::saveLead);
     }
 
