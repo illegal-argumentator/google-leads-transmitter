@@ -4,7 +4,6 @@ import com.google.ads.googleads.v23.services.GoogleAdsRow;
 import com.google.ads.googleads.v23.services.GoogleAdsServiceClient;
 import com.google.ads.googleads.v23.services.SearchGoogleAdsRequest;
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.exception.GoogleAdsApiException;
-import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.props.GoogleProps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,18 +16,19 @@ import java.util.List;
 @RequiredArgsConstructor
 class GoogleLeadsClient {
 
-    private final GoogleProps props;
     private final GoogleAdsServiceClient serviceClient;
 
-    public List<GoogleAdsRow> searchAds(String query) {
+    public List<GoogleAdsRow> searchAds(String query, String customerId) {
+
         List<GoogleAdsRow> rows = new ArrayList<>();
         SearchGoogleAdsRequest request = SearchGoogleAdsRequest.newBuilder()
-                .setCustomerId(props.getCustomerId())
+                .setCustomerId(customerId)
                 .setQuery(query)
                 .build();
 
         try {
             GoogleAdsServiceClient.SearchPagedResponse response = serviceClient.search(request);
+            log.info("First response element: {}.", response.iterateAll().iterator().next());
             response.iterateAll().forEach(rows::add);
         } catch (Exception e) {
             throw new GoogleAdsApiException(e.getMessage());
@@ -36,5 +36,4 @@ class GoogleLeadsClient {
 
         return rows;
     }
-
 }

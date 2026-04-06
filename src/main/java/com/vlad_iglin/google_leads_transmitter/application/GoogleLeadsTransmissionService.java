@@ -23,7 +23,7 @@ public class GoogleLeadsTransmissionService {
         log.info("Retrieving latest leads from Google Ads.");
         List<Lead> leads = googleLeadsPort.getLatestLeads();
         log.info("Saving leads.");
-        leads.forEach(this::saveLead);
+//        leads.forEach(this::saveLead);
     }
 
     private void saveLead(Lead lead) {
