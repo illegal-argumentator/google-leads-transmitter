@@ -31,7 +31,7 @@ public final class GoogleAdsQueryBuilder {
     public static String leadsSearchByCreationDateFrom(ZonedDateTime from) {
         DateTimeFormatter pattern = DateTimeFormatter.ofPattern(GOOGLE_ADS_TIME_FORMAT);
         String date = from.format(pattern);
-        String where = CREATION_DATE_TIME + " >= " + date;
+        String where = CREATION_DATE_TIME + " >= '" + date + "'";
         return SELECT_TEMPLATE_WHERE.formatted(String.join(COMMA_DELIMITER, LEAD_FIELDS), LEAD_COLLECTION, where);
     }
 }
