@@ -18,6 +18,7 @@ class GoogleAdsConfig {
     public GoogleAdsClient googleAdsClient() {
         return GoogleAdsClient.newBuilder()
                 .setDeveloperToken(props.getDeveloperToken())
+                .setLoginCustomerId(Long.parseLong(props.getLoginCustomerId()))
                 .setCredentials(UserCredentials.newBuilder()
                         .setClientId(props.getClientId())
                         .setClientSecret(props.getClientSecret())

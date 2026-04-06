@@ -16,6 +16,7 @@ public class GoogleProps {
     private String developerToken;
 
     private String clientId;
+    private String loginCustomerId;
     private List<String> customerIds;
 
     private String clientSecret;
