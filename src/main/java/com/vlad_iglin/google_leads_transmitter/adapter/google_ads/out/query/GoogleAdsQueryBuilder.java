@@ -27,11 +27,14 @@ public final class GoogleAdsQueryBuilder {
     static String COMMA_DELIMITER = ", ";
 
     static String SELECT_TEMPLATE_WHERE = SELECT + " %s " + FROM + " %s " + WHERE + " %s";
+    static String SELECT_TEMPLATE = SELECT + " %s " + FROM + " %s";
 
     public static String leadsSearchByCreationDateFrom(ZonedDateTime from) {
         DateTimeFormatter pattern = DateTimeFormatter.ofPattern(GOOGLE_ADS_TIME_FORMAT);
         String date = from.format(pattern);
         String where = CREATION_DATE_TIME + " >= '" + date + "'";
+
+        if (from.toEpochSecond() == 0) return SELECT_TEMPLATE.formatted(String.join(COMMA_DELIMITER, LEAD_FIELDS), LEAD_COLLECTION);
         return SELECT_TEMPLATE_WHERE.formatted(String.join(COMMA_DELIMITER, LEAD_FIELDS), LEAD_COLLECTION, where);
     }
 }

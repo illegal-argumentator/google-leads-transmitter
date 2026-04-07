@@ -42,7 +42,7 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
 
         List<GoogleAdsRow> rows = searchAdsConcurrently(time);
         if (rows.isEmpty())
-            throw new NoLeadsException("Not found new leads for last %s minutes.".formatted(interval / 3600));
+            throw new NoLeadsException("Not found new leads for last %s minutes.".formatted(interval / 1000 / 5));
 
         log.info("Retrieved {} rows from Google Ads.", rows.size());
         return rows.stream().filter(GoogleAdsRow::hasLocalServicesLead).map(row -> mapper.toLead(row, props.getReferralSource())).toList();

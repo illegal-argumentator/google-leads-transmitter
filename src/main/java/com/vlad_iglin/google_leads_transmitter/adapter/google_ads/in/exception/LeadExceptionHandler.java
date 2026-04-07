@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-class LeadExceptionHandler {
+public class LeadExceptionHandler {
 
     @ExceptionHandler(NoLeadsException.class)
-    void handleNoLeadsException(NoLeadsException e) {
+    public void handleNoLeadsException(NoLeadsException e) {
         log.info(e.getMessage());
     }
 
     @ExceptionHandler(GoogleAdsApiException.class)
-    void handleGoogleAdsApiException(GoogleAdsApiException e) {
+    public void handleGoogleAdsApiException(GoogleAdsApiException e) {
         log.error(e.getMessage());
     }
 
