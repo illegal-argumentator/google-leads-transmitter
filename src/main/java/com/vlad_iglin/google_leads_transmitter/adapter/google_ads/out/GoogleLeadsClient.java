@@ -33,8 +33,6 @@ class GoogleLeadsClient {
             throw new GoogleAdsApiException(e.getMessage());
         }
 
-        log.info("All rows: {}.", rows);
-
         return rows;
     }
 }

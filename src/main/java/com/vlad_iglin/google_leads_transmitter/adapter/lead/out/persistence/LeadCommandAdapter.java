@@ -14,8 +14,18 @@ class LeadCommandAdapter implements LeadCommandPort {
     private final LeadMapper mapper;
 
     @Override
-    public void save(Lead lead) {
+    public boolean save(Lead lead) {
+        if (existsByEmail(lead.email()) || existsByPhone(lead.phoneNumber())) return false;
         repository.save(mapper.toEntity(lead));
+        return true;
+    }
+
+    private boolean existsByEmail(String email) {
+        return repository.existsByEmail(email);
+    }
+
+    private boolean existsByPhone(String phone) {
+        return repository.existsByPhoneNumber(phone);
     }
 
 }

@@ -31,7 +31,8 @@ public class GoogleLeadsTransmissionService {
     }
 
     private void saveLead(Lead lead) {
-        leadCommandPort.save(lead);
-//        movingLeadCommandPort.save(lead);
+        boolean saved = leadCommandPort.save(lead);
+        if (!saved) return;
+        movingLeadCommandPort.save(lead);
     }
 }
