@@ -31,6 +31,7 @@ class GoogleLeadsClient {
             log.info("First response element: {}.", response.iterateAll().iterator().next());
             response.iterateAll().forEach(rows::add);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new GoogleAdsApiException(e.getMessage());
         }
 

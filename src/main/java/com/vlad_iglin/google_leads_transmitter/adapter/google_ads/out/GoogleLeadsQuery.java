@@ -41,8 +41,7 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
         ZonedDateTime time = ZonedDateTime.now(ZoneId.of(props.getAccount().timezone())).minus(interval, ChronoUnit.MILLIS);
 
         List<GoogleAdsRow> rows = searchAdsConcurrently(time);
-        if (rows.isEmpty())
-            throw new NoLeadsException("Not found new leads for last %s minutes.".formatted(interval / 1000 / 5));
+        if (rows.isEmpty()) throw new NoLeadsException("Not found new leads for last %s minutes.".formatted(interval / 1000 / 5));
 
         log.info("Retrieved {} rows from Google Ads.", rows.size());
         return rows.stream().filter(GoogleAdsRow::hasLocalServicesLead).map(row -> mapper.toLead(row, props.getReferralSource())).toList();
@@ -52,17 +51,14 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
         List<CompletableFuture<List<GoogleAdsRow>>> futures = new ArrayList<>();
 
         for (String customerId : props.getCustomerIds()) {
-            CompletableFuture<List<GoogleAdsRow>> future = CompletableFuture.supplyAsync(() -> client.searchAds(GoogleAdsQueryBuilder.leadsSearchByCreationDateFrom(time), customerId));
+            String query = GoogleAdsQueryBuilder.leadsSearchByCreationDateFrom(time);
+            log.info("Query: {}.", query);
+            CompletableFuture<List<GoogleAdsRow>> future = CompletableFuture.supplyAsync(() -> client.searchAds(query, customerId));
             futures.add(future);
         }
 
         return futures.stream()
-                .flatMap(row -> row
-                        .exceptionally(throwable -> {
-                                    log.warn("Exception occurred while waiting for future: {}.", throwable.getMessage());
-                                    return Collections.emptyList();
-                                }
-                        ).join().stream())
+                .flatMap(row -> row.exceptionally(throwable -> Collections.emptyList()).join().stream())
                 .toList();
     }
 }
