@@ -52,7 +52,6 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
 
         for (String customerId : props.getCustomerIds()) {
             String query = GoogleAdsQueryBuilder.leadsSearchByCreationDateFrom(time);
-            log.info("Query: {}.", query);
             CompletableFuture<List<GoogleAdsRow>> future = CompletableFuture.supplyAsync(() -> client.searchAds(query, customerId));
             futures.add(future);
         }

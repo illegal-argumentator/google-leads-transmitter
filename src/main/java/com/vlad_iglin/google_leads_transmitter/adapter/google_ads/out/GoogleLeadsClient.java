@@ -28,7 +28,6 @@ class GoogleLeadsClient {
 
         try {
             GoogleAdsServiceClient.SearchPagedResponse response = serviceClient.search(request);
-            log.info("First response element: {}.", response.iterateAll().iterator().next());
             response.iterateAll().forEach(rows::add);
         } catch (Exception e) {
             throw new GoogleAdsApiException(e.getMessage());
