@@ -50,7 +50,6 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
     private List<LocalServicesLead> searchAdsConcurrently(ZonedDateTime time) {
         List<CompletableFuture<List<LocalServicesLead>>> futures = new ArrayList<>();
         String query = GoogleAdsQueryBuilder.leadsSearchByCreationDateFrom(time);
-        System.out.println(query);
 
         for (String customerId : props.getCustomerIds()) {
             CompletableFuture<List<LocalServicesLead>> future = CompletableFuture.supplyAsync(() -> client.searchLeads(query, customerId));
