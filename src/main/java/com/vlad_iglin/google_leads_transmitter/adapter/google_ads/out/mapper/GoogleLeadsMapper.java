@@ -12,10 +12,11 @@ public interface GoogleLeadsMapper {
     default Lead toLead(LocalServicesLead lead, String referralSource) {
         ContactDetails contactDetails = lead.getContactDetails();
         return new Lead(
-                contactDetails.getDescriptorForType().getFullName(),
+                lead.getContactDetails().getConsumerName(),
                 contactDetails.getEmail(),
                 contactDetails.getPhoneNumber(),
-                referralSource
+                referralSource,
+                lead.getCreationDateTime()
         );
     }
 

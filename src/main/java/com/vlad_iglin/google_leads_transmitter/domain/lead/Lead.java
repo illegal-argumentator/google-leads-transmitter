@@ -4,6 +4,7 @@ public record Lead(
         String fullName,
         String email,
         String phoneNumber,
-        String referralSource
+        String referralSource,
+        String creationDateTime
 ) {
 }

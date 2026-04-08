@@ -38,10 +38,12 @@ class LeadCommandAdapter implements LeadCommandPort {
     }
 
     private boolean existsByEmail(String email) {
+        if (StringUtils.isBlank(email)) return false;
         return repository.existsByEmail(email);
     }
 
     private boolean existsByPhone(String phone) {
+        if (StringUtils.isBlank(phone)) return false;
         return repository.existsByPhoneNumber(phone);
     }
 
