@@ -1,5 +1,6 @@
 package com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out;
 
+import com.google.ads.googleads.v23.resources.LocalServicesLead;
 import com.google.ads.googleads.v23.services.GoogleAdsRow;
 import com.google.ads.googleads.v23.services.GoogleAdsServiceClient;
 import com.google.ads.googleads.v23.services.SearchGoogleAdsRequest;
@@ -18,8 +19,7 @@ class GoogleLeadsClient {
 
     private final GoogleAdsServiceClient serviceClient;
 
-    public List<GoogleAdsRow> searchAds(String query, String customerId) {
-
+    public List<LocalServicesLead> searchLeads(String query, String customerId) {
         List<GoogleAdsRow> rows = new ArrayList<>();
         SearchGoogleAdsRequest request = SearchGoogleAdsRequest.newBuilder()
                 .setCustomerId(customerId)
@@ -33,6 +33,9 @@ class GoogleLeadsClient {
             throw new GoogleAdsApiException(e.getMessage());
         }
 
-        return rows;
+        return rows.stream()
+                .filter(GoogleAdsRow::hasLocalServicesLead)
+                .map(GoogleAdsRow::getLocalServicesLead)
+                .toList();
     }
 }

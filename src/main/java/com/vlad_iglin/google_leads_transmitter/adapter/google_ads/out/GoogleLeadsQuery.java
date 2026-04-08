@@ -1,6 +1,6 @@
 package com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out;
 
-import com.google.ads.googleads.v23.services.GoogleAdsRow;
+import com.google.ads.googleads.v23.resources.LocalServicesLead;
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.exception.NoLeadsException;
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.mapper.GoogleLeadsMapper;
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.props.GoogleProps;
@@ -40,19 +40,19 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
     private List<Lead> getMappedLeads() {
         ZonedDateTime time = ZonedDateTime.now(ZoneId.of(props.getAccount().timezone())).minus(interval, ChronoUnit.MILLIS);
 
-        List<GoogleAdsRow> rows = searchAdsConcurrently(time);
+        List<LocalServicesLead> rows = searchAdsConcurrently(time);
         if (rows.isEmpty()) throw new NoLeadsException("Not found new leads for last %s minutes.".formatted(interval / 1000 / 60));
 
         log.info("Retrieved {} rows from Google Ads.", rows.size());
-        return rows.stream().filter(GoogleAdsRow::hasLocalServicesLead).map(row -> mapper.toLead(row, props.getReferralSource())).toList();
+        return rows.stream().filter(LocalServicesLead::hasContactDetails).map(row -> mapper.toLead(row, props.getReferralSource())).toList();
     }
 
-    private List<GoogleAdsRow> searchAdsConcurrently(ZonedDateTime time) {
-        List<CompletableFuture<List<GoogleAdsRow>>> futures = new ArrayList<>();
+    private List<LocalServicesLead> searchAdsConcurrently(ZonedDateTime time) {
+        List<CompletableFuture<List<LocalServicesLead>>> futures = new ArrayList<>();
 
         for (String customerId : props.getCustomerIds()) {
             String query = GoogleAdsQueryBuilder.leadsSearchByCreationDateFrom(time);
-            CompletableFuture<List<GoogleAdsRow>> future = CompletableFuture.supplyAsync(() -> client.searchAds(query, customerId));
+            CompletableFuture<List<LocalServicesLead>> future = CompletableFuture.supplyAsync(() -> client.searchLeads(query, customerId));
             futures.add(future);
         }
 
