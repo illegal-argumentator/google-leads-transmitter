@@ -1,6 +1,7 @@
 package com.vlad_iglin.google_leads_transmitter.adapter.smartmoving.out;
 
 import com.vlad_iglin.google_leads_transmitter.adapter.http.out.OkHttpService;
+import com.vlad_iglin.google_leads_transmitter.adapter.http.out.dto.ResponseBody;
 import com.vlad_iglin.google_leads_transmitter.domain.lead.Lead;
 import com.vlad_iglin.google_leads_transmitter.port.MovingLeadCommandPort;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +28,16 @@ class MovingLeadCommandAdapter implements MovingLeadCommandPort {
     private final OkHttpService okHttpService;
 
     @Override
-    public void save(Lead lead) {
+    public boolean save(Lead lead) {
         String jsonBody = objectMapper.writeValueAsString(lead);
 
         Request request = new Request.Builder()
                 .url(MovingApiPathBuilder.buildLeads(PROVIDER_KEY))
                 .post(RequestBody.create(jsonBody, MediaType.get(APPLICATION_JSON_VALUE)))
                 .build();
-        String response = okHttpService.handleApiRequest(request);
+        ResponseBody response = okHttpService.handleApiRequest(request);
         log.info("SmartMoving response: {}", response);
+
+        return response.isSuccessful();
     }
 }

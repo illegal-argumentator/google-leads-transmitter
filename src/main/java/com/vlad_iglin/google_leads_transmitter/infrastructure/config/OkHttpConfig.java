@@ -1,4 +1,4 @@
-package com.vlad_iglin.google_leads_transmitter.infrastructure;
+package com.vlad_iglin.google_leads_transmitter.infrastructure.config;
 
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;

@@ -4,7 +4,7 @@ import com.google.ads.googleads.v23.resources.ContactDetails;
 import com.google.ads.googleads.v23.resources.LocalServicesLead;
 import com.google.ads.googleads.v23.services.GoogleAdsRow;
 import com.vlad_iglin.google_leads_transmitter.domain.lead.Lead;
-import com.vlad_iglin.google_leads_transmitter.infrastructure.MapStructConfig;
+import com.vlad_iglin.google_leads_transmitter.infrastructure.config.MapStructConfig;
 import org.mapstruct.Mapper;
 
 @Mapper(config = MapStructConfig.class)

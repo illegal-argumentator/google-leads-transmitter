@@ -7,4 +7,8 @@ interface LeadRepository extends MongoRepository<MongoLead, String> {
     boolean existsByEmail(String email);
 
     boolean existsByPhoneNumber(String phoneNumber);
+
+    void deleteByEmail(String email);
+
+    void deleteByPhoneNumber(String phoneNumber);
 }

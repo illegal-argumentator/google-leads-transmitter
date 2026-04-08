@@ -6,4 +6,6 @@ public interface LeadCommandPort {
 
     boolean save(Lead lead);
 
+    void delete(Lead lead);
+
 }
