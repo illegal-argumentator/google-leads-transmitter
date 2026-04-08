@@ -36,7 +36,7 @@ class MovingLeadCommandAdapter implements MovingLeadCommandPort {
                 .post(RequestBody.create(jsonBody, MediaType.get(APPLICATION_JSON_VALUE)))
                 .build();
         ResponseBody response = okHttpService.handleApiRequest(request);
-        log.info("SmartMoving response: {}", response);
+        log.info("SmartMoving response: {} for lead: {}.", response, lead);
 
         return response.isSuccessful();
     }
