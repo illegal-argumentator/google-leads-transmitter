@@ -4,6 +4,7 @@ import com.google.ads.googleads.v23.resources.ContactDetails;
 import com.google.ads.googleads.v23.resources.LocalServicesLead;
 import com.vlad_iglin.google_leads_transmitter.domain.lead.Lead;
 import com.vlad_iglin.google_leads_transmitter.infrastructure.config.MapStructConfig;
+import com.vlad_iglin.google_leads_transmitter.shared.StringUtils;
 import org.mapstruct.Mapper;
 
 @Mapper(config = MapStructConfig.class)
@@ -11,8 +12,9 @@ public interface GoogleLeadsMapper {
 
     default Lead toLead(LocalServicesLead lead, String referralSource) {
         ContactDetails contactDetails = lead.getContactDetails();
+        String consumerName = lead.getContactDetails().getConsumerName();
         return new Lead(
-                lead.getContactDetails().getConsumerName(),
+                StringUtils.isBlank(consumerName) ? "no_name_lead" : consumerName,
                 contactDetails.getEmail(),
                 contactDetails.getPhoneNumber(),
                 referralSource,
