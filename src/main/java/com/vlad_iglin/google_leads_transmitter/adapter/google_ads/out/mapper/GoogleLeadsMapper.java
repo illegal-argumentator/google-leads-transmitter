@@ -10,14 +10,15 @@ import org.mapstruct.Mapper;
 @Mapper(config = MapStructConfig.class)
 public interface GoogleLeadsMapper {
 
-    default Lead toLead(LocalServicesLead lead, String referralSource) {
+    default Lead toLead(LocalServicesLead lead, String referralSource, String defaultLeadName) {
         ContactDetails contactDetails = lead.getContactDetails();
         String consumerName = lead.getContactDetails().getConsumerName();
         return new Lead(
-                StringUtils.isBlank(consumerName) ? "no_name_lead" : consumerName,
+                StringUtils.isBlank(consumerName) ? defaultLeadName : consumerName,
                 contactDetails.getEmail(),
                 contactDetails.getPhoneNumber(),
                 referralSource,
+                lead.getResourceName(),
                 lead.getCreationDateTime()
         );
     }

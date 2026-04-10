@@ -3,35 +3,32 @@ package com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.query;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
-import java.time.*;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+
+import static com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.query.LeadCollection.LEAD_COLLECTION;
+import static com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.query.LeadCollection.LEAD_CONVERSATION_COLLECTION;
+import static com.vlad_iglin.google_leads_transmitter.shared.Delimiters.COMMA_DELIMITER;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public final class GoogleAdsQueryBuilder {
-    static String GOOGLE_ADS_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
-    static String LEAD_COLLECTION = "local_services_lead";
-
-    static String LEAD_ID = LEAD_COLLECTION + ".id";
-    static String LEAD_TYPE = LEAD_COLLECTION + ".lead_type";
-    static String CONTACT_DETAILS = LEAD_COLLECTION + ".contact_details";
-    static String LEAD_STATUS = LEAD_COLLECTION + ".lead_status";
-    static String CREATION_DATE_TIME = LEAD_COLLECTION + ".creation_date_time";
-
-    static List<String> LEAD_FIELDS = List.of(LEAD_ID, LEAD_TYPE, CONTACT_DETAILS, LEAD_STATUS, CREATION_DATE_TIME);
 
     static String SELECT = "SELECT";
     static String FROM = "FROM";
     static String WHERE = "WHERE";
-    static String COMMA_DELIMITER = ", ";
 
     static String SELECT_TEMPLATE_WHERE = SELECT + " %s " + FROM + " %s " + WHERE + " %s";
+    static String GOOGLE_ADS_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     public static String leadsSearchByCreationDateFrom(ZonedDateTime from) {
         DateTimeFormatter pattern = DateTimeFormatter.ofPattern(GOOGLE_ADS_TIME_FORMAT);
         String date = from.format(pattern);
-        String where = CREATION_DATE_TIME + " >= '" + date + "'";
-        return SELECT_TEMPLATE_WHERE.formatted(String.join(COMMA_DELIMITER, LEAD_FIELDS), LEAD_COLLECTION, where);
+        String where = LeadField.CREATION_DATE_TIME.withCollection() + " >= '" + date + "'";
+        return SELECT_TEMPLATE_WHERE.formatted(String.join(COMMA_DELIMITER.getDelimiter(), LeadField.allWithCollection()), LEAD_COLLECTION.getCollection(), where);
+    }
+
+    public static String leadConversationsSearchByResource(String resource) {
+        String where = LeadConversationField.LEAD.withCollection() + " = '" + resource + "'";
+        return SELECT_TEMPLATE_WHERE.formatted(String.join(COMMA_DELIMITER.getDelimiter(), LeadConversationField.allWithCollection()), LEAD_CONVERSATION_COLLECTION.getCollection(), where);
     }
 }

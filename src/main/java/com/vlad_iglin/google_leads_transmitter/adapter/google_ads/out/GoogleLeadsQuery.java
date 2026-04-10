@@ -29,6 +29,9 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
     private final GoogleLeadsClient client;
     private final GoogleLeadsMapper mapper;
 
+    @Value("${lead.default.name}")
+    private String DEFAULT_LEAD_NAME;
+
     @Value("${data-sync.interval}")
     private long interval;
 
@@ -41,10 +44,14 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
         ZonedDateTime time = ZonedDateTime.now(ZoneId.of(props.getAccount().timezone())).minus(interval, ChronoUnit.MILLIS);
 
         List<LocalServicesLead> rows = searchAdsConcurrently(time);
-        if (rows.isEmpty()) throw new NoLeadsException("Not found new leads for last %s minutes.".formatted(interval / 1000 / 60));
+        if (rows.isEmpty())
+            throw new NoLeadsException("Not found new leads for last %s minutes.".formatted(interval / 1000 / 60));
 
         log.info("Retrieved {} rows from Google Ads.", rows.size());
-        return rows.stream().filter(LocalServicesLead::hasContactDetails).map(row -> mapper.toLead(row, props.getReferralSource())).toList();
+        return rows.stream()
+                .filter(LocalServicesLead::hasContactDetails)
+                .map(row -> mapper.toLead(row, props.getReferralSource(), DEFAULT_LEAD_NAME))
+                .toList();
     }
 
     private List<LocalServicesLead> searchAdsConcurrently(ZonedDateTime time) {
