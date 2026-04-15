@@ -1,0 +1,3 @@
+spring:
+  mongodb:
+    uri: mongodb://google-leads:K8a0dPqc@google-leads-mongodb:27017/google-leads-db?authSource=admin

@@ -5,6 +5,7 @@ import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.exception.
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.mapper.GoogleLeadsMapper;
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.props.GoogleProps;
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.query.GoogleAdsQueryBuilder;
+import com.vlad_iglin.google_leads_transmitter.adapter.lead.out.props.LeadProps;
 import com.vlad_iglin.google_leads_transmitter.domain.lead.Lead;
 import com.vlad_iglin.google_leads_transmitter.port.GoogleLeadsPort;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +26,11 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class GoogleLeadsQuery implements GoogleLeadsPort {
 
-    private final GoogleProps props;
+    private final LeadProps leadProps;
+    private final GoogleProps googleProps;
+
     private final GoogleLeadsClient client;
     private final GoogleLeadsMapper mapper;
-
-    @Value("${lead.default.name}")
-    private String DEFAULT_LEAD_NAME;
 
     @Value("${data-sync.interval}")
     private long interval;
@@ -41,7 +41,7 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
     }
 
     private List<Lead> getMappedLeads() {
-        ZonedDateTime time = ZonedDateTime.now(ZoneId.of(props.getAccount().timezone())).minus(interval, ChronoUnit.MILLIS);
+        ZonedDateTime time = ZonedDateTime.now(ZoneId.of(googleProps.getAccount().timezone())).minus(interval, ChronoUnit.MILLIS);
 
         List<LocalServicesLead> rows = searchAdsConcurrently(time);
         if (rows.isEmpty())
@@ -50,7 +50,7 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
         log.info("Retrieved {} rows from Google Ads.", rows.size());
         return rows.stream()
                 .filter(LocalServicesLead::hasContactDetails)
-                .map(row -> mapper.toLead(row, props.getReferralSource(), DEFAULT_LEAD_NAME))
+                .map(row -> mapper.toLead(row, leadProps))
                 .toList();
     }
 
@@ -58,8 +58,8 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
         List<CompletableFuture<List<LocalServicesLead>>> futures = new ArrayList<>();
         String query = GoogleAdsQueryBuilder.leadsSearchByCreationDateFrom(time);
 
-        for (String customerId : props.getCustomerIds()) {
-            CompletableFuture<List<LocalServicesLead>> future = CompletableFuture.supplyAsync(() -> client.searchLeads(query, customerId));
+        for (LeadProps.Account account : leadProps.getAccounts()) {
+            CompletableFuture<List<LocalServicesLead>> future = CompletableFuture.supplyAsync(() -> client.searchLeads(query, account.customerId()));
             futures.add(future);
         }
 
