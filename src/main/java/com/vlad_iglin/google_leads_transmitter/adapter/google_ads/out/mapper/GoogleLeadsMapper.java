@@ -7,6 +7,9 @@ import com.vlad_iglin.google_leads_transmitter.infrastructure.config.MapStructCo
 import com.vlad_iglin.google_leads_transmitter.shared.StringUtils;
 import org.mapstruct.Mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mapper(config = MapStructConfig.class)
 public interface GoogleLeadsMapper {
 
@@ -18,6 +21,7 @@ public interface GoogleLeadsMapper {
                 contactDetails.getEmail(),
                 contactDetails.getPhoneNumber(),
                 referralSource,
+                new ArrayList<>(List.of("Lead Id: %s".formatted(lead.getId()))),
                 lead.getResourceName(),
                 lead.getCreationDateTime()
         );

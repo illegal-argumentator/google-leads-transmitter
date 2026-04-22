@@ -1,10 +1,13 @@
 package com.vlad_iglin.google_leads_transmitter.domain.lead;
 
+import java.util.List;
+
 public record Lead(
         String fullName,
         String email,
         String phoneNumber,
         String referralSource,
+        List<String> notes,
         String resourceName,
         String creationDateTime
 ) {
@@ -21,5 +24,4 @@ public record Lead(
 
         return split[1];
     }
-
 }

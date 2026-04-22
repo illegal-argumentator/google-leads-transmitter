@@ -24,6 +24,7 @@ public class GoogleLeadsTransmissionService {
             log.info("Retrieving latest leads from Google Ads.");
             List<Lead> leads = googleLeadsPort.getLatestLeads();
             log.info("Saving leads.");
+            log.info(String.valueOf(leads));
             leads.forEach(this::saveLead);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -32,8 +33,8 @@ public class GoogleLeadsTransmissionService {
 
     private void saveLead(Lead lead) {
         boolean savedLocal = leadCommandPort.save(lead);
-        if (!savedLocal) return;
-        boolean savedCrm = movingLeadCommandPort.save(lead);
-        if (!savedCrm) leadCommandPort.delete(lead);
+//        if (!savedLocal) return;
+//        boolean savedCrm = movingLeadCommandPort.save(lead);
+//        if (!savedCrm) leadCommandPort.delete(lead);
     }
 }

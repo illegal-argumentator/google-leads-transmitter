@@ -18,6 +18,7 @@ public final class GoogleAdsQueryBuilder {
     static String WHERE = "WHERE";
 
     static String SELECT_TEMPLATE_WHERE = SELECT + " %s " + FROM + " %s " + WHERE + " %s";
+    static String SELECT_TEMPLATE = SELECT + " %s " + FROM + " %s";
     static String GOOGLE_ADS_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     public static String leadsSearchByCreationDateFrom(ZonedDateTime from) {
@@ -30,5 +31,9 @@ public final class GoogleAdsQueryBuilder {
     public static String leadConversationsSearchByResource(String resource) {
         String where = LeadConversationField.LEAD.withCollection() + " = '" + resource + "'";
         return SELECT_TEMPLATE_WHERE.formatted(String.join(COMMA_DELIMITER.getDelimiter(), LeadConversationField.allWithCollection()), LEAD_CONVERSATION_COLLECTION.getCollection(), where);
+    }
+
+    public static String leadConversationsSearch() {
+        return SELECT_TEMPLATE.formatted(String.join(COMMA_DELIMITER.getDelimiter(), LeadConversationField.allWithCollection()), LEAD_CONVERSATION_COLLECTION.getCollection());
     }
 }
