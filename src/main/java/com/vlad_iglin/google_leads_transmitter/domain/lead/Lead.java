@@ -6,7 +6,9 @@ public record Lead(
         String phoneNumber,
         String referralSource,
         String resourceName,
-        String creationDateTime
+        String creationDateTime,
+        String originAddressFull,
+        String branchId
 ) {
 
     public static String getCustomerId(String resourceName) {

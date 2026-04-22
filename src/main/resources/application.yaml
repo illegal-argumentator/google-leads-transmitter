@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: google-leads-transmitter
+  profiles:
+    active: prod
+
+server:
+  port: 8140
+  servlet:
+    context-path: /api
+
+smartmoving:
+  provider-key: ${SMARTMOVING_PROVIDER_KEY}
+
+google:
+  account:
+    timezone: America/Los_Angeles
+  developer-token: ${GOOGLE_DEVELOPER_TOKEN}
+  client-id: ${GOOGLE_CLIENT_ID}
+  login-customer-id: 3302313884
+  client-secret: ${GOOGLE_CLIENT_SECRET}
+  refresh-token: ${GOOGLE_REFRESH_TOKEN}
+
+data-sync:
+  interval: 86400000
+
+lead:
+  name: 'Google Customer'
+  referralSource: 'Google Local Services'
+  accounts:
+    - location: 'Los Angeles'
+      branchId: 'b00959a6-0f04-4069-ae11-af2001415fd9'
+      customerId: '6958309795'
+
+    - location: 'Austin'
+      branchId: 'd13af5d1-2eee-4602-b0d2-b267014b48db'
+      customerId: '2223075774'
+
+    - location: 'Portland'
+      branchId: 'e6a43aeb-1f77-4163-b9a8-af2001429860'
+      customerId: '2595930533'

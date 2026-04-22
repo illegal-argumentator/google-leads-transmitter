@@ -16,10 +16,11 @@ public class MongoLead {
 
     @Indexed(unique = true)
     private String email;
-
     private String phoneNumber;
 
     private String referralSource;
+    private String originAddressFull;
+    private String branchId;
 
     private String creationDateTime;
 }
