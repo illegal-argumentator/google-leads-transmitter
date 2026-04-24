@@ -4,6 +4,7 @@ import com.vlad_iglin.google_leads_transmitter.domain.lead.Lead;
 import com.vlad_iglin.google_leads_transmitter.port.LeadQueryPort;
 import com.vlad_iglin.google_leads_transmitter.shared.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,7 +14,7 @@ public class LeadQueryAdapter implements LeadQueryPort {
     private final LeadRepository repository;
 
     @Override
-    public boolean exists(Lead lead) {
+    public boolean exists(@NotNull Lead lead) {
         return existsByEmail(lead.email()) || existsByPhone(lead.phoneNumber());
     }
 

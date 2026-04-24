@@ -56,7 +56,9 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
             return leads;
         }
 
-        return leads.stream().filter(leadQueryPort::exists).toList();
+        return leads.stream()
+                .filter(lead -> !leadQueryPort.exists(lead))
+                .toList();
     }
 
     private List<Lead> getLeads() {
