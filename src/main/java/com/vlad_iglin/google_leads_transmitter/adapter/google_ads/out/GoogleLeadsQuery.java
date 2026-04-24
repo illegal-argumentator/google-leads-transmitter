@@ -9,6 +9,7 @@ import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.query.Goog
 import com.vlad_iglin.google_leads_transmitter.adapter.lead.out.props.LeadProps;
 import com.vlad_iglin.google_leads_transmitter.domain.lead.Lead;
 import com.vlad_iglin.google_leads_transmitter.port.GoogleLeadsPort;
+import com.vlad_iglin.google_leads_transmitter.port.LeadQueryPort;
 import com.vlad_iglin.google_leads_transmitter.shared.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 public class GoogleLeadsQuery implements GoogleLeadsPort {
 
     private final LeadProps leadProps;
+    private final LeadQueryPort leadQueryPort;
     private final GoogleProps googleProps;
 
     private final GoogleLeadsClient client;
@@ -41,13 +43,23 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
     private long interval;
 
     @Override
-    public List<Lead> getLatestLeads() {
-        List<Lead> leads = getMappedLeads();
+    public List<Lead> getLatestLeads(boolean includeExisting) {
+        List<Lead> leads = getLeadsByExisting(includeExisting);
         withConversations(leads);
         return leads;
     }
 
-    private List<Lead> getMappedLeads() {
+    private List<Lead> getLeadsByExisting(boolean includeExisting) {
+        List<Lead> leads = getLeads();
+
+        if (includeExisting) {
+            return leads;
+        }
+
+        return leads.stream().filter(leadQueryPort::exists).toList();
+    }
+
+    private List<Lead> getLeads() {
         ZonedDateTime time = ZonedDateTime.now(ZoneId.of(googleProps.getAccount().timezone())).minus(interval, ChronoUnit.MILLIS);
 
         List<LocalServicesLead> rows = searchAdsConcurrently(time);

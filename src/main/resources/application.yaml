@@ -9,6 +9,9 @@ server:
   servlet:
     context-path: /api
 
+thread:
+  limit: 4
+
 smartmoving:
   provider-key: ${SMARTMOVING_PROVIDER_KEY}
 
@@ -22,7 +25,7 @@ google:
   refresh-token: ${GOOGLE_REFRESH_TOKEN}
 
 data-sync:
-  interval: 86400000
+  interval: 600000
 
 lead:
   name: 'Google Customer'
@@ -39,3 +42,7 @@ lead:
     - location: 'Portland'
       branchId: 'e6a43aeb-1f77-4163-b9a8-af2001429860'
       customerId: '2595930533'
+
+    - location: 'Seattle'
+      branchId: '9f19804a-8041-4351-a643-afeb0136475e'
+      customerId: '5551062937'

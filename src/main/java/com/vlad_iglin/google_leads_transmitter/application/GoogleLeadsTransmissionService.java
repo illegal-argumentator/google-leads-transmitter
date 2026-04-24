@@ -1,6 +1,7 @@
 package com.vlad_iglin.google_leads_transmitter.application;
 
 import com.vlad_iglin.google_leads_transmitter.domain.lead.Lead;
+import com.vlad_iglin.google_leads_transmitter.infrastructure.system.SystemProps;
 import com.vlad_iglin.google_leads_transmitter.port.GoogleLeadsPort;
 import com.vlad_iglin.google_leads_transmitter.port.LeadCommandPort;
 import com.vlad_iglin.google_leads_transmitter.port.MovingLeadCommandPort;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GoogleLeadsTransmissionService {
 
+    private final SystemProps systemProps;
     private final GoogleLeadsPort googleLeadsPort;
     private final LeadCommandPort leadCommandPort;
     private final MovingLeadCommandPort movingLeadCommandPort;
@@ -22,7 +24,7 @@ public class GoogleLeadsTransmissionService {
     public void processTransmission() {
         try {
             log.info("Retrieving latest leads from Google Ads.");
-            List<Lead> leads = googleLeadsPort.getLatestLeads();
+            List<Lead> leads = googleLeadsPort.getLatestLeads(false);
             log.info("Saving leads.");
             leads.forEach(this::saveLead);
         } catch (Exception e) {
@@ -31,9 +33,16 @@ public class GoogleLeadsTransmissionService {
     }
 
     private void saveLead(Lead lead) {
-        boolean savedLocal = leadCommandPort.save(lead);
-        if (!savedLocal) return;
-        boolean savedCrm = movingLeadCommandPort.save(lead);
-        if (!savedCrm) leadCommandPort.delete(lead);
+        SystemProps.Leads leads = systemProps.getLeads();
+
+        if (leads.saveToDb()) {
+            boolean savedLocal = leadCommandPort.save(lead);
+            if (!savedLocal) return;
+        }
+
+        if (leads.saveToCrm()) {
+            boolean savedCrm = movingLeadCommandPort.save(lead);
+            if (!savedCrm) leadCommandPort.delete(lead);
+        }
     }
 }

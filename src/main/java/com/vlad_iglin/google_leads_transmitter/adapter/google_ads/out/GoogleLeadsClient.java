@@ -5,6 +5,7 @@ import com.google.ads.googleads.v23.resources.LocalServicesLeadConversation;
 import com.google.ads.googleads.v23.services.GoogleAdsRow;
 import com.google.ads.googleads.v23.services.GoogleAdsServiceClient;
 import com.google.ads.googleads.v23.services.SearchGoogleAdsRequest;
+import com.google.common.util.concurrent.RateLimiter;
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.exception.GoogleAdsApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,11 @@ class GoogleLeadsClient {
 
     private final GoogleAdsServiceClient serviceClient;
 
+    private final RateLimiter rateLimiter = RateLimiter.create(1.5);
+
     public List<GoogleAdsRow> searchAds(String query, String customerId) {
+        rateLimiter.acquire();
+
         List<GoogleAdsRow> rows = new ArrayList<>();
         SearchGoogleAdsRequest request = buildRequest(query, customerId);
 
