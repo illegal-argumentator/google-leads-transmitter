@@ -14,6 +14,8 @@ public class MongoLead {
     @Id
     private String id;
 
+    private long leadId;
+
     private String fullName;
 
     @Indexed(unique = true)

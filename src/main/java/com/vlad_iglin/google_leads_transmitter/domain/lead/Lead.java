@@ -3,6 +3,7 @@ package com.vlad_iglin.google_leads_transmitter.domain.lead;
 import java.util.List;
 
 public record Lead(
+        long leadId,
         String fullName,
         String email,
         String phoneNumber,

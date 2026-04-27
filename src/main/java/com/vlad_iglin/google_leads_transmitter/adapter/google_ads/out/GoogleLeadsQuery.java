@@ -108,6 +108,7 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
 
         String messages = conversations.stream()
                 .filter(LocalServicesLeadConversation::hasMessageDetails)
+                .filter(conversation -> !conversation.getMessageDetails().getText().isBlank())
                 .map(conversation -> " - " + conversation.getMessageDetails().getText())
                 .collect(Collectors.joining("\n"));
 

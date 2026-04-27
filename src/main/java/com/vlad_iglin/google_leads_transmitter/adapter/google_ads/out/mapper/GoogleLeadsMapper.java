@@ -19,6 +19,7 @@ public interface GoogleLeadsMapper {
         String consumerName = lead.getContactDetails().getConsumerName();
         LeadProps.Account account = props.getByCustomerId(Lead.getCustomerId(lead.getResourceName()));
         return new Lead(
+                lead.getId(),
                 StringUtils.isBlank(consumerName) ? props.getName() : consumerName,
                 contactDetails.getEmail(),
                 contactDetails.getPhoneNumber(),
