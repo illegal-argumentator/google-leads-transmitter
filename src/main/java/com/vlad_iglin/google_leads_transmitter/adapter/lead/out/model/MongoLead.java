@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Data
 @Document
 public class MongoLead {
@@ -12,11 +14,15 @@ public class MongoLead {
     @Id
     private String id;
 
+    private long leadId;
+
     private String fullName;
 
     @Indexed(unique = true)
     private String email;
     private String phoneNumber;
+
+    private List<String> notes;
 
     private String referralSource;
     private String originAddressFull;
