@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface GoogleLeadsPort {
 
-    List<Lead> getLatestLeads(boolean includeExisting);
+    List<Lead> getLatestLeads();
 
 }

@@ -1,5 +1,6 @@
 package com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out;
 
+import com.google.ads.googleads.v23.enums.LocalServicesLeadTypeEnum;
 import com.google.ads.googleads.v23.resources.LocalServicesLead;
 import com.google.ads.googleads.v23.resources.LocalServicesLeadConversation;
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.exception.NoLeadsException;
@@ -43,50 +44,51 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
     private long interval;
 
     @Override
-    public List<Lead> getLatestLeads(boolean includeExisting) {
-        List<Lead> leads = getLeadsByExisting(includeExisting);
+    public List<Lead> getLatestLeads() {
+        List<Lead> leads = getNotExistingLeads();
         withConversations(leads);
         return leads;
     }
 
-    private List<Lead> getLeadsByExisting(boolean includeExisting) {
-        List<Lead> leads = getLeads();
+    private List<Lead> getNotExistingLeads() {
+        List<Lead> leads = leadQueryPort.getAll();
+        List<CompletableFuture<List<Lead>>> futures = new ArrayList<>();
 
-        if (includeExisting) {
-            return leads;
+        for (LeadProps.Account account : leadProps.getAccounts()) {
+            CompletableFuture<List<Lead>> future = CompletableFuture.supplyAsync(() -> getLeads(account.branchId()), executorService);
+            futures.add(future);
         }
 
-        return leads.stream()
-                .filter(lead -> !leadQueryPort.exists(lead))
+        return futures.stream()
+                .flatMap(row -> row.exceptionally(throwable -> {
+                    log.error("Error fetching leads: {}.", throwable.getMessage());
+                    return Collections.emptyList();
+                }).join().stream())
+                .peek(lead -> System.out.println("Lead:" + lead))
+                .filter(lead -> !lead.contains(leads))
                 .toList();
     }
 
-    private List<Lead> getLeads() {
+    private List<Lead> getLeads(String branchId) {
         ZonedDateTime time = ZonedDateTime.now(ZoneId.of(googleProps.getAccount().timezone())).minus(interval, ChronoUnit.MILLIS);
+        LocalServicesLeadTypeEnum.LeadType leadType = LocalServicesLeadTypeEnum.LeadType.forNumber(leadProps.getLeadType());
 
-        List<LocalServicesLead> rows = searchAdsConcurrently(time);
+        List<LocalServicesLead> rows = searchLeadsConcurrently(branchId, time);
         if (rows.isEmpty())
             throw new NoLeadsException("Not found new leads for last %s minutes.".formatted(interval / 1000 / 60));
 
         log.info("Retrieved {} rows from Google Ads.", rows.size());
         return rows.stream()
                 .filter(LocalServicesLead::hasContactDetails)
-                .map(row -> mapper.toLead(row, leadProps))
+                .filter(localServicesLead -> leadProps.getLeadType() == -1 || localServicesLead.getLeadType() == leadType)
+                .map(row -> mapper.toLead(branchId, row))
                 .toList();
     }
 
-    private List<LocalServicesLead> searchAdsConcurrently(ZonedDateTime time) {
-        List<CompletableFuture<List<LocalServicesLead>>> futures = new ArrayList<>();
+    private List<LocalServicesLead> searchLeadsConcurrently(String branchId, ZonedDateTime time) {
         String query = GoogleAdsQueryBuilder.leadsSearchByCreationDateFrom(time);
-
-        for (LeadProps.Account account : leadProps.getAccounts()) {
-            CompletableFuture<List<LocalServicesLead>> future = CompletableFuture.supplyAsync(() -> client.searchLeads(query, account.customerId()), executorService);
-            futures.add(future);
-        }
-
-        return futures.stream()
-                .flatMap(row -> row.exceptionally(throwable -> Collections.emptyList()).join().stream())
-                .toList();
+        LeadProps.Account account = leadProps.getByBranchId(branchId);
+        return client.searchLeads(query, account.customerId());
     }
 
     private void withConversations(List<Lead> leads) {
@@ -95,12 +97,15 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
         for (Lead lead : leads) {
             String query = GoogleAdsQueryBuilder.leadConversationsSearchByResource(lead.resourceName());
             CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> client.searchConversations(query, Lead.getCustomerId(lead.resourceName())), executorService)
-                    .exceptionally(throwable -> Collections.emptyList())
-                    .thenAccept(conversations -> handleConversation(lead, conversations));
+                    .thenAccept(conversations -> handleConversation(lead, conversations))
+                    .exceptionally(throwable -> {
+                        log.error("Error in conversation pipeline", throwable);
+                        return null;
+                    });
             futures.add(future);
         }
 
-        futures.forEach(CompletableFuture::join);
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
 
     private void handleConversation(Lead lead, List<LocalServicesLeadConversation> conversations) {

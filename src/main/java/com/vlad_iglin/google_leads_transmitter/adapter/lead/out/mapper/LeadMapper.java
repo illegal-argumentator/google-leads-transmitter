@@ -15,6 +15,8 @@ public interface LeadMapper {
 
     MongoLead toEntity(Lead lead);
 
+    Lead toLead(MongoLead entity);
+
     @Mapping(target = "notes", source = "notes", qualifiedByName = "listToString")
     SaveLeadRequest toRequest(Lead lead);
 

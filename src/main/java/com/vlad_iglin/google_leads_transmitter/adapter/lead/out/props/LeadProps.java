@@ -15,6 +15,7 @@ public class LeadProps {
 
     String name;
     String referralSource;
+    int leadType;
     List<Account> accounts;
 
     public record Account(
@@ -23,10 +24,10 @@ public class LeadProps {
             String customerId
     ) {}
 
-    public Account getByCustomerId(String customerId) {
+    public Account getByBranchId(String branchId) {
         return accounts.stream()
-                .filter(account -> account.customerId.equals(customerId))
+                .filter(account -> account.branchId.equals(branchId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Account not found by customer id: %s.".formatted(customerId)));
+                .orElseThrow(() -> new IllegalArgumentException("Account not found by branch id: %s.".formatted(branchId)));
     }
 }

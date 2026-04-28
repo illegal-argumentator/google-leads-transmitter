@@ -24,7 +24,7 @@ public class GoogleLeadsTransmissionService {
     public void processTransmission() {
         try {
             log.info("Retrieving latest leads from Google Ads.");
-            List<Lead> leads = googleLeadsPort.getLatestLeads(false);
+            List<Lead> leads = googleLeadsPort.getLatestLeads();
             log.info("Saving leads {}.", leads.size());
             leads.forEach(this::saveLead);
         } catch (Exception e) {

@@ -30,6 +30,7 @@ data-sync:
 lead:
   name: 'Google Customer'
   referralSource: 'Google Local Services'
+  leadType: 2
   accounts:
     - location: 'Los Angeles'
       branchId: 'b00959a6-0f04-4069-ae11-af2001415fd9'
