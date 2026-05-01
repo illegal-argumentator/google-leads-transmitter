@@ -6,3 +6,4 @@ system:
   leads:
     save-to-db: true
     save-to-crm: true
+    request-summary: true

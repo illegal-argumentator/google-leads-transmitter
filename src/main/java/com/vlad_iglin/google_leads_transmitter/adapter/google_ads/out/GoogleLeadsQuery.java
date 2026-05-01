@@ -9,6 +9,7 @@ import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.props.Goog
 import com.vlad_iglin.google_leads_transmitter.adapter.google_ads.out.query.GoogleAdsQueryBuilder;
 import com.vlad_iglin.google_leads_transmitter.adapter.lead.out.props.LeadProps;
 import com.vlad_iglin.google_leads_transmitter.domain.lead.Lead;
+import com.vlad_iglin.google_leads_transmitter.infrastructure.system.SystemProps;
 import com.vlad_iglin.google_leads_transmitter.port.GoogleLeadsPort;
 import com.vlad_iglin.google_leads_transmitter.port.LeadQueryPort;
 import com.vlad_iglin.google_leads_transmitter.shared.StringUtils;
@@ -35,6 +36,7 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
     private final LeadProps leadProps;
     private final LeadQueryPort leadQueryPort;
     private final GoogleProps googleProps;
+    private final SystemProps systemProps;
 
     private final GoogleLeadsClient client;
     private final GoogleLeadsMapper mapper;
@@ -61,10 +63,10 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
 
         return futures.stream()
                 .flatMap(row -> row.exceptionally(throwable -> {
-                    log.error("Error fetching leads: {}.", throwable.getMessage());
+                    log.warn("Error fetching leads: {}", throwable.getMessage());
                     return Collections.emptyList();
                 }).join().stream())
-                .peek(lead -> System.out.println("Lead:" + lead))
+                .peek(lead -> log.info("Lead: {}.", lead))
                 .filter(lead -> !lead.contains(leads))
                 .toList();
     }
@@ -75,9 +77,9 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
 
         List<LocalServicesLead> rows = searchLeadsConcurrently(branchId, time);
         if (rows.isEmpty())
-            throw new NoLeadsException("Not found new leads for last %s minutes.".formatted(interval / 1000 / 60));
+            throw new NoLeadsException("Not found new leads for last %s minutes on branch %s.".formatted(interval / 1000 / 60, branchId));
 
-        log.info("Retrieved {} rows from Google Ads.", rows.size());
+        log.info("Retrieved {} rows from Google Ads from branch {}.", rows.size(), branchId);
         return rows.stream()
                 .filter(LocalServicesLead::hasContactDetails)
                 .filter(localServicesLead -> leadProps.getLeadType() == -1 || localServicesLead.getLeadType() == leadType)
@@ -92,6 +94,8 @@ public class GoogleLeadsQuery implements GoogleLeadsPort {
     }
 
     private void withConversations(List<Lead> leads) {
+        if (!systemProps.getLeads().requestSummary() || leads.isEmpty()) return;
+
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 
         for (Lead lead : leads) {

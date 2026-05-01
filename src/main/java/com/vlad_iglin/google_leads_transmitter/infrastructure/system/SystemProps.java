@@ -18,7 +18,8 @@ public class SystemProps {
 
     public record Leads(
             boolean saveToDb,
-            boolean saveToCrm
+            boolean saveToCrm,
+            boolean requestSummary
     ) { }
 
     @PostConstruct
