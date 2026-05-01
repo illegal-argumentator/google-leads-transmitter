@@ -35,14 +35,14 @@ public class GoogleLeadsTransmissionService {
     private void saveLead(Lead lead) {
         SystemProps.Leads leads = systemProps.getLeads();
 
-//        if (leads.saveToDb()) {
-//            boolean savedLocal = leadCommandPort.save(lead);
-//            if (!savedLocal) return;
-//        }
-//
-//        if (leads.saveToCrm()) {
-//            boolean savedCrm = movingLeadCommandPort.save(lead);
-//            if (!savedCrm) leadCommandPort.delete(lead);
-//        }
+        if (leads.saveToDb()) {
+            boolean savedLocal = leadCommandPort.save(lead);
+            if (!savedLocal) return;
+        }
+
+        if (leads.saveToCrm()) {
+            boolean savedCrm = movingLeadCommandPort.save(lead);
+            if (!savedCrm) leadCommandPort.delete(lead);
+        }
     }
 }
